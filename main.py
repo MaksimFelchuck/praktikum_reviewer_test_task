@@ -5,7 +5,7 @@ class Record:
     def __init__(self, amount, comment, date=''):
         self.amount = amount
 
-        # Условие логичнее сделать наоборот 
+        # Условие логичнее сделать наоборот
         # dt.datetime.strptime(date, '%d.%m.%Y').date() if date else ...
         self.date = (
             dt.datetime.now().date() if
@@ -26,6 +26,7 @@ class Calculator:
         # Тут и далее нет типизации, что такое record? в чём измеряется amount у Record?
         # Например, def add_record(self, record: Record) -> None:
         # Тут и далее нет докстрингов к функциям
+        # Добавить докстринги ко всем функциям в каждом классе с полным описанием входных параметров
         self.records.append(record)
 
     def get_today_stats(self):
@@ -56,7 +57,7 @@ class CaloriesCalculator(Calculator):
     # Комментарий к функции должен быть в докстринге
     def get_calories_remained(self):  # Получает остаток калорий на сегодня
 
-        # Что такое X?  Название переменной должно быть осмысленным 
+        # Что такое X?  Название переменной должно быть осмысленным
         x = self.limit - self.get_today_stats()
         if x > 0:
             # Бэкслеши для переносов не применяются.
@@ -64,6 +65,7 @@ class CaloriesCalculator(Calculator):
                    f' ещё, но с общей калорийностью не более {x} кКал'
         else:
             # Просто return 'Хватит есть!'
+            # Не хватает пробела
             return('Хватит есть!')
 
 
@@ -79,10 +81,10 @@ class CashCalculator(Calculator):
         currency_type = currency
         cash_remained = self.limit - self.get_today_stats()
 
-        # Вынести в отдельную функцию
+        # Можно вынести в отдельную функцию
         # Почему в одном случае проверка идёт currency, в других currency_type?
         # Нет описание зачем эта часть кода нужна.
-        # А если я введу currency которое не подходит ни под одно из условий? 
+        # А если я введу currency которое не подходит ни под одно из условий?
         # Нужно предложить пользователю в каком формате выводить валюту "rub", "usd" или "eur"
         # и вызывать ошибку, в случае несоответствия
         # + лучше где то указать, что по умолчанию amount хранится в рублях
@@ -93,8 +95,21 @@ class CashCalculator(Calculator):
             cash_remained /= EURO_RATE
             currency_type = 'Euro'
         elif currency_type == 'rub':
-            cash_remained == 1.00
+            cash_remained == 1.00  # Это не понятно зачем тут
             currency_type = 'руб'
+
+        # Вообще от всех этих условий можно избавиться,
+        # сделав словарь rates, где за ключ брать код валюты, за значение курс
+        # Например:
+        # rates = {
+        #     'usd': 60,
+        #     'eur': 70,
+        #     'rub': 1
+        # }
+        # Тогда можно будет сделать:
+        # rate = rates.get(currency)
+        # cash_remained /= rate
+
         if cash_remained > 0:
             return (
                 # В f-строках применяется только подстановка переменных и нет логических или
